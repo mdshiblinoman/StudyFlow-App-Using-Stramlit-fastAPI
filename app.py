@@ -26,7 +26,6 @@ is_authenticated = st.session_state.supabase_user is not None
 st.markdown(
     """
     <div class="bg-hero shadow-hero tw-rounded-hero p-8 text-white mb-6">
-        <div class="bg-badge text-badge inline-block rounded-full px-3 py-1 text-sm font-bold mb-4">StudyFlow Auth</div>
         <h1 class="m-0 text-4xl leading-tight font-semibold">Welcome to StudyFlow</h1>
         <p class="mt-3 max-w-4xl text-base opacity-90">
             Sign up first, then sign in with Supabase authentication. Your logged-in session stays available in Streamlit until you log out.
@@ -57,8 +56,6 @@ with left:
     st.markdown('</div>', unsafe_allow_html=True)
 
 with right:
-    st.markdown('<div class="bg-card ring-card shadow-card backdrop-blur-12 tw-rounded-card p-5">', unsafe_allow_html=True)
-    st.subheader("Welcome")
 
     if is_authenticated:
         user = st.session_state.supabase_user
@@ -72,7 +69,6 @@ with right:
             <div class="bg-gradient-to-b from-white to-blue-50 ring-panel shadow-panel tw-rounded-panel p-4">
                 <p><strong>Name:</strong> {metadata.get('name', 'Not set')}</p>
                 <p><strong>University:</strong> {metadata.get('university_name', 'Not set')}</p>
-                <p><strong>Session:</strong> {metadata.get('session', 'Not set')}</p>
                 <p><strong>Subject:</strong> {metadata.get('subject', 'Not set')}</p>
                 <p><strong>Email:</strong> {email_value or 'Not set'}</p>
             </div>
@@ -88,16 +84,6 @@ with right:
             st.session_state.supabase_user = None
             st.session_state.supabase_session = None
             st.rerun()
-    else:
-        st.info("You are not signed in yet.")
-        st.caption("Create an account in the Sign up tab first. Then use the Sign in tab to log in with Supabase.")
-
-    st.markdown("---")
-    st.write("**Session state**")
-    if st.session_state.supabase_session:
-        st.caption("Login session is stored in Streamlit session state for the current browser session.")
-    else:
-        st.caption("No active session stored yet.")
 
     st.markdown('</div>', unsafe_allow_html=True)
 

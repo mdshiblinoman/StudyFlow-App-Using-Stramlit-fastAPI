@@ -7,7 +7,6 @@ def render_signup(client):
     with st.form("signup_form", clear_on_submit=False):
         name = st.text_input("Name", placeholder="Your full name", key="signup_name")
         university_name = st.text_input("University name", placeholder="Your university", key="signup_university")
-        session_name = st.text_input("Session", placeholder="2023-2027", key="signup_session")
         subject = st.text_input("Subject", placeholder="Computer Science", key="signup_subject")
         signup_email = st.text_input("Email", placeholder="you@example.com", key="signup_email")
         signup_password = st.text_input("Password", type="password", placeholder="Create a password", key="signup_password")
@@ -23,8 +22,6 @@ def render_signup(client):
         errors.append("Name is required.")
     if not university_name.strip():
         errors.append("University name is required.")
-    if not session_name.strip():
-        errors.append("Session is required.")
     if not subject.strip():
         errors.append("Subject is required.")
     if not signup_email.strip():
@@ -50,7 +47,6 @@ def render_signup(client):
                     "data": {
                         "name": name.strip(),
                         "university_name": university_name.strip(),
-                        "session": session_name.strip(),
                         "subject": subject.strip(),
                     }
                 },
