@@ -145,6 +145,32 @@ TAILWIND_UTILITY_CSS = """
     .ring-panel {
         border: 1px solid rgba(148, 163, 184, 0.18);
     }
+    div[data-testid="stButton"] > button,
+    div[data-testid="stFormSubmitButton"] > button {
+        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+        color: #ffffff;
+        border: none;
+        border-radius: 14px;
+        box-shadow: 0 10px 24px rgba(37, 99, 235, 0.22);
+        transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+    }
+    div[data-testid="stButton"] > button:hover,
+    div[data-testid="stFormSubmitButton"] > button:hover {
+        filter: brightness(1.03);
+        box-shadow: 0 14px 30px rgba(37, 99, 235, 0.28);
+        transform: translateY(-1px);
+    }
+    div[data-testid="stButton"] > button:focus,
+    div[data-testid="stFormSubmitButton"] > button:focus {
+        box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.45), 0 14px 30px rgba(37, 99, 235, 0.28);
+    }
+    div[data-testid="stButton"] > button:disabled,
+    div[data-testid="stFormSubmitButton"] > button:disabled {
+        background: linear-gradient(135deg, #94a3b8 0%, #cbd5e1 100%);
+        color: rgba(255, 255, 255, 0.85);
+        box-shadow: none;
+        transform: none;
+    }
     .tw-rounded-hero {
         border-radius: 28px;
     }
