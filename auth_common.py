@@ -1,7 +1,7 @@
 import os
+from pathlib import Path
 
 import streamlit as st
-from dotenv import load_dotenv
 
 try:
     from supabase import create_client
@@ -9,74 +9,160 @@ except ImportError:
     create_client = None
 
 
-load_dotenv()
+def load_env_file(env_path=".env"):
+    env_file = Path(env_path)
+    if not env_file.exists():
+        return
 
-TAILWIND_INSPIRED_CSS = """
+    for raw_line in env_file.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+
+        key, value = line.split("=", 1)
+        os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+
+
+load_env_file()
+
+TAILWIND_UTILITY_CSS = """
 <style>
-    .stApp {
+    .bg-page {
         background:
             radial-gradient(circle at top left, rgba(37, 99, 235, 0.18), transparent 30%),
             linear-gradient(135deg, #eef4ff 0%, #f7fbff 45%, #ffffff 100%);
     }
-    .tw-hero {
+    .bg-hero {
         background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 52%, #2563eb 100%);
-        padding: 2.2rem;
-        border-radius: 28px;
-        color: white;
+    }
+    .shadow-hero {
         box-shadow: 0 22px 60px rgba(15, 23, 42, 0.22);
-        margin-bottom: 1.5rem;
     }
-    .tw-hero h1 {
-        margin: 0;
-        font-size: 2.4rem;
-        line-height: 1.05;
-    }
-    .tw-hero p {
-        margin: 0.75rem 0 0;
-        opacity: 0.92;
-        font-size: 1.02rem;
-        max-width: 52rem;
-    }
-    .tw-card {
-        background: rgba(255, 255, 255, 0.84);
-        border: 1px solid rgba(148, 163, 184, 0.20);
-        border-radius: 24px;
-        padding: 1.2rem 1.2rem 0.6rem;
+    .shadow-card {
         box-shadow: 0 16px 42px rgba(15, 23, 42, 0.08);
+    }
+    .shadow-panel {
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+    }
+    .backdrop-blur-12 {
         backdrop-filter: blur(12px);
     }
-    .tw-badge {
-        display: inline-block;
+    .bg-card {
+        background: rgba(255, 255, 255, 0.84);
+    }
+    .bg-badge {
         background: rgba(219, 234, 254, 0.96);
+    }
+    .bg-gradient-to-b {
+        background-image: linear-gradient(to bottom, var(--tw-gradient-from, #ffffff), var(--tw-gradient-to, #eff6ff));
+    }
+    .from-white {
+        --tw-gradient-from: #ffffff;
+    }
+    .to-blue-50 {
+        --tw-gradient-to: #eff6ff;
+    }
+    .text-badge {
         color: #1d4ed8;
-        padding: 0.38rem 0.75rem;
-        border-radius: 999px;
-        font-size: 0.82rem;
+    }
+    .text-soft {
+        color: #64748b;
+    }
+    .text-white {
+        color: #ffffff;
+    }
+    .text-sm {
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+    }
+    .text-base {
+        font-size: 1rem;
+        line-height: 1.5rem;
+    }
+    .text-4xl {
+        font-size: 2.25rem;
+        line-height: 2.5rem;
+    }
+    .font-semibold {
+        font-weight: 600;
+    }
+    .font-bold {
         font-weight: 700;
-        margin-bottom: 0.9rem;
+    }
+    .leading-tight {
+        line-height: 1.25;
+    }
+    .m-0 {
+        margin: 0;
+    }
+    .mt-3 {
+        margin-top: 0.75rem;
+    }
+    .mt-4 {
+        margin-top: 1rem;
+    }
+    .mb-4 {
+        margin-bottom: 1rem;
+    }
+    .mb-6 {
+        margin-bottom: 1.5rem;
+    }
+    .p-4 {
+        padding: 1rem;
+    }
+    .p-5 {
+        padding: 1.25rem;
+    }
+    .p-8 {
+        padding: 2rem;
+    }
+    .px-3 {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+    .py-1 {
+        padding-top: 0.25rem;
+        padding-bottom: 0.25rem;
+    }
+    .inline-block {
+        display: inline-block;
+    }
+    .rounded-full {
+        border-radius: 9999px;
+    }
+    .max-w-4xl {
+        max-width: 56rem;
+    }
+    .opacity-90 {
+        opacity: 0.9;
+    }
+    .text-center {
+        text-align: center;
+    }
+    .ring-card {
+        border: 1px solid rgba(148, 163, 184, 0.20);
+    }
+    .ring-panel {
+        border: 1px solid rgba(148, 163, 184, 0.18);
+    }
+    .tw-rounded-hero {
+        border-radius: 28px;
+    }
+    .tw-rounded-card {
+        border-radius: 24px;
+    }
+    .tw-rounded-panel {
+        border-radius: 18px;
     }
     div[data-testid="stForm"] {
         background: transparent;
-    }
-    .tw-footer {
-        color: #64748b;
-        font-size: 0.9rem;
-        text-align: center;
-        margin-top: 1rem;
-    }
-    .tw-panel {
-        border-radius: 18px;
-        padding: 1rem;
-        background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(239,246,255,0.92));
-        border: 1px solid rgba(148, 163, 184, 0.18);
-        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
     }
 </style>
 """
 
 
 def apply_styles():
-    st.markdown(TAILWIND_INSPIRED_CSS, unsafe_allow_html=True)
+    st.markdown(TAILWIND_UTILITY_CSS, unsafe_allow_html=True)
 
 
 def get_supabase_client():
