@@ -1,5 +1,5 @@
 import streamlit as st
-from auth_common import extract_session, extract_user, normalize_session
+from auth_common import clear_supabase_state, extract_session, extract_user, normalize_session
 
 PUBLIC_UNIVERSITIES = [
     "University of Dhaka",
@@ -163,12 +163,12 @@ def render_signup(client):
         except Exception:
             pass
 
-        if user is None:
-            st.success(
-                "Check your inbox and confirm your account before signing in. If you want to skip email confirmation, disable it in the Supabase dashboard under Authentication > Providers > Email."
-            )
-        else:
-            st.success("Account created. Please sign in with your email and password.")
+        clear_supabase_state(reset_client=True)
+
+        st.success("Account created successfully.")
+        st.info(
+            "Check your email for the Supabase verification link before signing in. If you want users to sign in immediately, disable email confirmation in the Supabase dashboard under Authentication > Providers > Email."
+        )
 
         st.rerun()
     except Exception as exc:

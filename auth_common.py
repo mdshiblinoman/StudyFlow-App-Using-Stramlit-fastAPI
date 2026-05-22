@@ -193,7 +193,11 @@ def apply_styles():
 
 def get_supabase_client():
     url = os.getenv("NEXT_PUBLIC_SUPABASE_URL") or os.getenv("SUPABASE_URL")
-    key = os.getenv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY") or os.getenv("SUPABASE_KEY")
+    key = (
+        os.getenv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY")
+        or os.getenv("SUPABASE_ANON_KEY")
+        or os.getenv("SUPABASE_KEY")
+    )
     if not url or not key or create_client is None:
         return None
 
@@ -235,6 +239,13 @@ def normalize_session(session):
         "access_token": getattr(session, "access_token", None) or session.get("access_token"),
         "refresh_token": getattr(session, "refresh_token", None) or session.get("refresh_token"),
     }
+
+
+def clear_supabase_state(reset_client=False):
+    st.session_state.supabase_user = None
+    st.session_state.supabase_session = None
+    if reset_client:
+        st.session_state.pop("supabase_client", None)
 
 
 def restore_session(client):
