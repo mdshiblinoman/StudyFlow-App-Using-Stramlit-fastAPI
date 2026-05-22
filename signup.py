@@ -1,7 +1,5 @@
 import streamlit as st
-
 from auth_common import extract_session, extract_user, normalize_session
-
 
 PUBLIC_UNIVERSITIES = [
     "University of Dhaka",
@@ -31,7 +29,6 @@ PUBLIC_UNIVERSITIES = [
     "National University",
 ]
 
-
 PRIVATE_UNIVERSITIES = [
     "BRAC University",
     "North South University",
@@ -42,7 +39,6 @@ PRIVATE_UNIVERSITIES = [
     "Daffodil International University",
     "University of Asia Pacific",
     "United International University",
-    "BRAC University",
     "Stamford University Bangladesh",
     "Southeast University",
     "City University",
@@ -71,9 +67,7 @@ PRIVATE_UNIVERSITIES = [
     "The People's University of Bangladesh",
 ]
 
-
 SESSION_OPTIONS = [
-    "Select session",
     "2025-2026",
     "2024-2025",
     "2023-2024",
@@ -83,45 +77,27 @@ SESSION_OPTIONS = [
     "2019-2020",
 ]
 
-
 UNIVERSITY_OPTIONS = ["Select university"] + list(dict.fromkeys(PUBLIC_UNIVERSITIES + PRIVATE_UNIVERSITIES))
 
-
-ENGINEERING_SUBJECT_OPTIONS = [
-    "Select engineering department",
+COMPUTER_SUBJECT_OPTIONS = [
     "Computer Science and Engineering (CSE)",
-    "Electrical and Electronic Engineering (EEE)",
-    "Mechanical Engineering (ME)",
-    "Civil Engineering (CE)",
-    "Industrial and Production Engineering (IPE)",
-    "Textile Engineering",
-    "Materials and Metallurgical Engineering",
-    "Chemical Engineering",
-    "Petroleum and Mining Engineering",
-    "Architecture",
-    "Biomedical Engineering",
-    "Mechatronics Engineering",
+    "Electronics and Communication Engineering (ECE)",
     "Software Engineering",
     "Information and Communication Engineering",
-    "Biomedical Physics and Technology",
-    "Environmental Engineering",
-    "Naval Architecture and Marine Engineering",
-    "Aerospace Engineering",
 ]
-
 
 def render_signup(client):
     with st.form("signup_form", clear_on_submit=False):
         name = st.text_input("Name", placeholder="Your full name", key="signup_name")
-        university_name = st.selectbox("University name", UNIVERSITY_OPTIONS, index=0, key="signup_university")
+        university_name = st.selectbox("University name", UNIVERSITY_OPTIONS, index=1, key="signup_university")
         session_name = st.selectbox("Session", SESSION_OPTIONS, index=0, key="signup_session")
-        subject = st.selectbox("Engineering department", ENGINEERING_SUBJECT_OPTIONS, index=0, key="signup_subject")
+        subject = st.selectbox("Computer related subject", COMPUTER_SUBJECT_OPTIONS, index=0, key="signup_subject")
         signup_email = st.text_input("Email", placeholder="you@example.com", key="signup_email")
         signup_password = st.text_input(
             "Password",
             type="password",
             placeholder="Create a strong password",
-            help="Use 12+ characters with letters, numbers, and symbols.",
+            help="Use at least 8 characters with letters, numbers, and symbols.",
             key="signup_password",
         )
         confirm_password = st.text_input(
@@ -143,8 +119,8 @@ def render_signup(client):
         errors.append("University name is required.")
     if session_name == "Select session":
         errors.append("Session is required.")
-    if subject == "Select engineering department":
-        errors.append("Engineering department is required.")
+    if subject == "Select computer related subject":
+        errors.append("Computer related subject is required.")
     if not signup_email.strip():
         errors.append("Email is required.")
     if not signup_password:
@@ -177,13 +153,23 @@ def render_signup(client):
         session = extract_session(result)
         user = extract_user(result)
 
-        if user is None:
-            st.success("Account created. Check your email to confirm your account, then sign in.")
-            return
+        st.session_state.auth_mode = "signin"
+        st.session_state.current_view = "auth"
+        st.session_state.supabase_user = None
+        st.session_state.supabase_session = None
 
-        st.session_state.supabase_session = normalize_session(session)
-        st.session_state.supabase_user = user
-        st.success("Account created and signed in successfully.")
+        try:
+            client.auth.sign_out()
+        except Exception:
+            pass
+
+        if user is None:
+            st.success(
+                "Check your inbox and confirm your account before signing in. If you want to skip email confirmation, disable it in the Supabase dashboard under Authentication > Providers > Email."
+            )
+        else:
+            st.success("Account created. Please sign in with your email and password.")
+
         st.rerun()
     except Exception as exc:
         st.error(str(exc))
