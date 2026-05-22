@@ -2,6 +2,7 @@ import streamlit as st
 
 from auth_common import apply_styles, get_supabase_client, restore_session, user_field, user_metadata
 from home import render_home_page
+from subject import render_subject_page
 from signin import render_signin
 from signup import render_signup
 
@@ -51,6 +52,8 @@ if client is None:
 
 if st.session_state.current_view == "home" and is_authenticated:
     render_home_page(client, st.session_state.supabase_user)
+elif st.session_state.current_view == "subject" and is_authenticated:
+    render_subject_page(client)
 else:
     st.markdown(
         """
