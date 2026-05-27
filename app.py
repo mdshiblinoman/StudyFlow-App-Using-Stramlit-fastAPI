@@ -1,7 +1,7 @@
 import streamlit as st
 
 from auth_common import apply_styles, get_supabase_client, restore_session, user_field, user_metadata
-from home import render_home_page
+from home import render_home_page, render_profile_page
 from subject import render_subject_page
 from signin import render_signin
 from signup import render_signup
@@ -29,21 +29,22 @@ if "auth_mode" not in st.session_state:
 if "current_view" not in st.session_state:
     st.session_state.current_view = "home" if st.session_state.supabase_user is not None else "auth"
 
-if st.session_state.supabase_user is not None:
-    st.session_state.current_view = "home"
-else:
+if st.session_state.supabase_user is None:
     st.session_state.current_view = "auth"
+elif st.session_state.current_view == "auth":
+    st.session_state.current_view = "home"
 
 is_authenticated = st.session_state.supabase_user is not None
 
-st.markdown(
-    """
-    <div class="bg-hero shadow-hero tw-rounded-hero p-8 text-white mb-6">
-        <h1 class="m-0 text-4xl leading-tight font-semibold">Welcome to StudyFlow</h1>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+if st.session_state.current_view == "auth":
+    st.markdown(
+        """
+        <div class="bg-hero shadow-hero tw-rounded-hero p-8 text-white mb-6">
+            <h1 class="m-0 text-4xl leading-tight font-semibold">Welcome to StudyFlow</h1>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 if client is None:
     st.error("Supabase is not configured. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY to your .env file, and install the supabase package.")
@@ -54,6 +55,8 @@ if st.session_state.current_view == "home" and is_authenticated:
     render_home_page(client, st.session_state.supabase_user)
 elif st.session_state.current_view == "subject" and is_authenticated:
     render_subject_page(client)
+elif st.session_state.current_view == "profile" and is_authenticated:
+    render_profile_page(client, st.session_state.supabase_user)
 else:
     st.markdown(
         """

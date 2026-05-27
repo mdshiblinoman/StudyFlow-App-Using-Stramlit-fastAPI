@@ -11,6 +11,21 @@ def _link(name, site=None):
     return name, make_search_link(name, site="google")
 
 
+def _log_search(query, source):
+    if "search_history" not in st.session_state:
+        st.session_state.search_history = []
+
+    entry = {
+        "query": query,
+        "source": source,
+    }
+
+    history = st.session_state.search_history
+    if not history or history[0] != entry:
+        history.insert(0, entry)
+        st.session_state.search_history = history[:20]
+
+
 def render_subject_page(client):
     """Render subject detail page showing curated resources."""
     subject = st.session_state.get("selected_subject") or st.session_state.get("selected_language")
@@ -51,12 +66,15 @@ def render_subject_page(client):
         c1, c2, c3 = st.columns(3)
         if c1.button("YouTube"):
             st.session_state.resource_category = "youtube"
+            _log_search(f"{subject} - YouTube", "Resource type")
             st.rerun()
         if c2.button("Books"):
             st.session_state.resource_category = "books"
+            _log_search(f"{subject} - Books", "Resource type")
             st.rerun()
         if c3.button("Blogs"):
             st.session_state.resource_category = "blogs"
+            _log_search(f"{subject} - Blogs", "Resource type")
             st.rerun()
 
         st.markdown('<div class="mt-2"></div>', unsafe_allow_html=True)
